@@ -4,7 +4,7 @@ import { PostCard } from '../components/PostCard';
 import { useSocket } from '../context/SocketContext';
 import { API_URL } from '../config';
 
-export const FeedPage = ({ onHashtagClick }) => {
+export const FeedPage = ({ onHashtagClick, onRequireAuth }) => {
   const { socket } = useSocket();
   const [feedType, setFeedType] = useState('forYou'); // 'forYou' | 'following'
   const [posts, setPosts] = useState([]);
@@ -140,6 +140,7 @@ export const FeedPage = ({ onHashtagClick }) => {
                 <PostCard
                   post={post}
                   onHashtagClick={onHashtagClick}
+                  onRequireAuth={onRequireAuth}
                   onPostUpdated={() => fetchFeedPosts(true)}
                 />
               </div>

@@ -18,8 +18,16 @@ export default function App() {
   const { user } = useAuth();
   const [currentTab, setCurrentTab] = useState('home');
   const [selectedTag, setSelectedTag] = useState('');
+  const [selectedUsername, setSelectedUsername] = useState(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
+
+  // If user logs out while on a protected tab, reset tab back to public home feed
+  useEffect(() => {
+    if (!user && ['bookmarks', 'notifications', 'analytics'].includes(currentTab)) {
+      setCurrentTab('home');
+    }
+  }, [user, currentTab]);
 
   // Service Worker Registration for Web Push Notifications
   useEffect(() => {
@@ -30,27 +38,91 @@ export default function App() {
     }
   }, []);
 
+  const handleRequireAuth = () => {
+    setIsAuthOpen(true);
+  };
+
   const handleSelectHashtag = (tag) => {
     setSelectedTag(tag);
     setCurrentTab('trending');
   };
 
+  const handleSelectUser = (username) => {
+    setSelectedUsername(username);
+    setCurrentTab('profile');
+  };
+
+  const handleTabChange = (tabId) => {
+    if (tabId === 'profile') {
+      if (!user && !selectedUsername) {
+        handleRequireAuth();
+        return;
+      }
+      // If clicking own profile link in sidebar, view logged in user's profile
+      if (user) {
+        setSelectedUsername(user.username);
+      }
+    } else if (!user && ['bookmarks', 'notifications', 'analytics'].includes(tabId)) {
+      handleRequireAuth();
+      return;
+    }
+    setCurrentTab(tabId);
+  };
+
   const renderTabContent = () => {
     switch (currentTab) {
       case 'home':
-        return <FeedPage onHashtagClick={handleSelectHashtag} />;
+        return (
+          <FeedPage
+            onHashtagClick={handleSelectHashtag}
+            onRequireAuth={handleRequireAuth}
+            onSelectUser={handleSelectUser}
+          />
+        );
       case 'trending':
-        return <TrendingPage initialTag={selectedTag} onSelectTag={setSelectedTag} />;
+        return (
+          <TrendingPage
+            initialTag={selectedTag}
+            onSelectTag={setSelectedTag}
+            onRequireAuth={handleRequireAuth}
+            onSelectUser={handleSelectUser}
+          />
+        );
       case 'bookmarks':
-        return <BookmarksPage />;
+        return user ? (
+          <BookmarksPage onSelectUser={handleSelectUser} />
+        ) : (
+          <FeedPage onHashtagClick={handleSelectHashtag} onRequireAuth={handleRequireAuth} />
+        );
       case 'notifications':
-        return <NotificationCenter />;
+        return user ? (
+          <NotificationCenter onSelectUser={handleSelectUser} />
+        ) : (
+          <FeedPage onHashtagClick={handleSelectHashtag} onRequireAuth={handleRequireAuth} />
+        );
       case 'analytics':
-        return <AnalyticsDashboard />;
+        return user ? (
+          <AnalyticsDashboard />
+        ) : (
+          <FeedPage onHashtagClick={handleSelectHashtag} onRequireAuth={handleRequireAuth} />
+        );
       case 'profile':
-        return <ProfilePage />;
+        return (
+          <ProfilePage
+            username={selectedUsername || user?.username}
+            onRequireAuth={handleRequireAuth}
+            onSelectHashtag={handleSelectHashtag}
+            onSelectUser={handleSelectUser}
+          />
+        );
       default:
-        return <FeedPage onHashtagClick={handleSelectHashtag} />;
+        return (
+          <FeedPage
+            onHashtagClick={handleSelectHashtag}
+            onRequireAuth={handleRequireAuth}
+            onSelectUser={handleSelectUser}
+          />
+        );
     }
   };
 
@@ -61,7 +133,7 @@ export default function App() {
       <Navbar
         onOpenAuth={() => setIsAuthOpen(true)}
         currentTab={currentTab}
-        setCurrentTab={setCurrentTab}
+        setCurrentTab={handleTabChange}
         onSearch={(query) => {
           if (query.startsWith('#')) {
             handleSelectHashtag(query.replace('#', ''));
@@ -77,10 +149,11 @@ export default function App() {
         {/* Left Sidebar */}
         <Sidebar
           currentTab={currentTab}
-          setCurrentTab={setCurrentTab}
+          setCurrentTab={handleTabChange}
+          onRequireAuth={handleRequireAuth}
           onOpenCreatePost={() => {
             if (!user) {
-              setIsAuthOpen(true);
+              handleRequireAuth();
             } else {
               setIsCreatePostOpen(true);
             }
@@ -95,7 +168,7 @@ export default function App() {
         {/* Right Sidebar */}
         <RightBar
           onSelectHashtag={handleSelectHashtag}
-          onSelectUser={() => setCurrentTab('profile')}
+          onSelectUser={handleSelectUser}
         />
 
       </div>
@@ -103,7 +176,7 @@ export default function App() {
       {/* Floating Action Button (Mobile) */}
       <button
         onClick={() => {
-          if (!user) setIsAuthOpen(true);
+          if (!user) handleRequireAuth();
           else setIsCreatePostOpen(true);
         }}
         className="md:hidden fixed bottom-6 right-6 z-40 glow-btn p-4 rounded-full text-white shadow-pink-glow"

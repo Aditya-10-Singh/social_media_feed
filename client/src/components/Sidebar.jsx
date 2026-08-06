@@ -1,18 +1,28 @@
 import React from 'react';
 import { Home, Hash, Bookmark, Bell, BarChart3, User, PlusCircle } from 'lucide-react';
 import { useSocket } from '../context/SocketContext';
+import { useAuth } from '../context/AuthContext';
 
-export const Sidebar = ({ currentTab, setCurrentTab, onOpenCreatePost }) => {
+export const Sidebar = ({ currentTab, setCurrentTab, onOpenCreatePost, onRequireAuth }) => {
+  const { user } = useAuth();
   const { unreadCount } = useSocket();
 
   const navItems = [
-    { id: 'home', label: 'Home Feed', icon: Home },
-    { id: 'trending', label: 'Explore & Trends', icon: Hash },
-    { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark },
-    { id: 'notifications', label: 'Notifications', icon: Bell, badge: unreadCount },
-    { id: 'analytics', label: 'Analytics Dashboard', icon: BarChart3 },
-    { id: 'profile', label: 'Profile', icon: User },
+    { id: 'home', label: 'Home Feed', icon: Home, public: true },
+    { id: 'trending', label: 'Explore & Trends', icon: Hash, public: true },
+    { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark, public: false },
+    { id: 'notifications', label: 'Notifications', icon: Bell, badge: unreadCount, public: false },
+    { id: 'analytics', label: 'Analytics Dashboard', icon: BarChart3, public: false },
+    { id: 'profile', label: 'Profile', icon: User, public: false },
   ];
+
+  const handleTabClick = (item) => {
+    if (!item.public && !user) {
+      if (onRequireAuth) onRequireAuth();
+      return;
+    }
+    setCurrentTab(item.id);
+  };
 
   return (
     <aside className="w-64 hidden md:flex flex-col gap-2 p-4 sticky top-16 h-[calc(100vh-4rem)] border-r border-pulse-border-dark">
@@ -23,7 +33,7 @@ export const Sidebar = ({ currentTab, setCurrentTab, onOpenCreatePost }) => {
           return (
             <button
               key={item.id}
-              onClick={() => setCurrentTab(item.id)}
+              onClick={() => handleTabClick(item)}
               className={`flex items-center justify-between w-full px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-200 ${
                 isActive
                   ? 'bg-gradient-to-r from-pulse-pink/20 to-pulse-purple/20 text-pulse-pink border border-pulse-pink/40 shadow-pink-glow'
@@ -34,7 +44,7 @@ export const Sidebar = ({ currentTab, setCurrentTab, onOpenCreatePost }) => {
                 <Icon className={`w-5 h-5 ${isActive ? 'text-pulse-pink' : ''}`} />
                 <span>{item.label}</span>
               </div>
-              {item.badge > 0 && (
+              {item.badge > 0 && user && (
                 <span className="bg-pulse-pink text-white text-xs px-2 py-0.5 rounded-full font-bold">
                   {item.badge}
                 </span>

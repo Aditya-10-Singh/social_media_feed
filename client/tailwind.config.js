@@ -15,11 +15,11 @@ export default {
           'purple-dark': '#1E1035',
           'bg-dark': '#0B0716',
           'card-dark': '#140D26',
-          'border-dark': '#291A47',
+          'border-dark': 'var(--border-color)',
           cyan: '#00F5D4',
           violet: '#C084FC',
-          text: '#F3F0F8',
-          muted: '#9CA3AF'
+          text: 'var(--text-color)',
+          muted: 'var(--muted-color)'
         }
       },
       fontFamily: {
