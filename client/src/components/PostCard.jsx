@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { CommentSection } from './CommentSection';
 import { TipModal } from './TipModal';
 
-export const PostCard = ({ post, onPostUpdated, onHashtagClick }) => {
+export const PostCard = ({ post, onPostUpdated, onHashtagClick, onRequireAuth }) => {
   const { user } = useAuth();
   const [likesCount, setLikesCount] = useState(post.likes?.length || 0);
   const [hasLiked, setHasLiked] = useState(() => {
@@ -17,60 +17,87 @@ export const PostCard = ({ post, onPostUpdated, onHashtagClick }) => {
   const [showTipModal, setShowTipModal] = useState(false);
   const [repostCount, setRepostCount] = useState(post.repostCount || 0);
 
-  const handleLike = async () => {
-    if (!user) return;
-    try {
-      const token = localStorage.getItem('pulse_token');
-      const res = await fetch(`/api/posts/${post._id}/like`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setLikesCount(data.likesCount);
-        setHasLiked(data.hasLiked);
-      }
-    } catch (err) {
-      console.error('Like error:', err);
+  const checkAuthOrExecute = (actionFn) => {
+    if (!user) {
+      if (onRequireAuth) onRequireAuth();
+      return;
     }
+    actionFn();
   };
 
-  const handleBookmark = async () => {
-    if (!user) return;
-    try {
-      const token = localStorage.getItem('pulse_token');
-      const res = await fetch(`/api/posts/${post._id}/bookmark`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setIsBookmarked(data.isBookmarked);
+  const handleLike = () => {
+    checkAuthOrExecute(async () => {
+      try {
+        const token = localStorage.getItem('pulse_token');
+        const res = await fetch(`/api/posts/${post._id}/like`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setLikesCount(data.likesCount);
+          setHasLiked(data.hasLiked);
+        }
+      } catch (err) {
+        console.error('Like error:', err);
       }
-    } catch (err) {
-      console.error('Bookmark error:', err);
-    }
+    });
   };
 
-  const handleRepost = async () => {
-    if (!user) return;
-    try {
-      const token = localStorage.getItem('pulse_token');
-      const res = await fetch(`/api/posts/${post._id}/repost`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ comment: `Reposted from @${post.author?.username}` })
-      });
-      if (res.ok) {
-        setRepostCount(prev => prev + 1);
-        if (onPostUpdated) onPostUpdated();
+  const handleBookmark = () => {
+    checkAuthOrExecute(async () => {
+      try {
+        const token = localStorage.getItem('pulse_token');
+        const res = await fetch(`/api/posts/${post._id}/bookmark`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setIsBookmarked(data.isBookmarked);
+        }
+      } catch (err) {
+        console.error('Bookmark error:', err);
       }
-    } catch (err) {
-      console.error('Repost error:', err);
+    });
+  };
+
+  const handleRepost = () => {
+    checkAuthOrExecute(async () => {
+      try {
+        const token = localStorage.getItem('pulse_token');
+        const res = await fetch(`/api/posts/${post._id}/repost`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ comment: `Reposted from @${post.author?.username}` })
+        });
+        if (res.ok) {
+          setRepostCount(prev => prev + 1);
+          if (onPostUpdated) onPostUpdated();
+        }
+      } catch (err) {
+        console.error('Repost error:', err);
+      }
+    });
+  };
+
+  const handleCommentToggle = () => {
+    if (!user && onRequireAuth) {
+      onRequireAuth();
+      return;
     }
+    setShowComments(!showComments);
+  };
+
+  const handleTipClick = () => {
+    if (!user && onRequireAuth) {
+      onRequireAuth();
+      return;
+    }
+    setShowTipModal(true);
   };
 
   // Helper to highlight #hashtags
@@ -192,7 +219,7 @@ export const PostCard = ({ post, onPostUpdated, onHashtagClick }) => {
 
         {/* Comment */}
         <button
-          onClick={() => setShowComments(!showComments)}
+          onClick={handleCommentToggle}
           className="flex items-center gap-1.5 text-xs font-bold hover:text-pulse-cyan transition-colors"
         >
           <MessageSquare className="w-4 h-4" />
@@ -221,7 +248,7 @@ export const PostCard = ({ post, onPostUpdated, onHashtagClick }) => {
         {/* Tip Creator (Stripe Monetization) */}
         {post.author?._id !== user?._id && (
           <button
-            onClick={() => setShowTipModal(true)}
+            onClick={handleTipClick}
             className="flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full bg-pulse-pink/10 text-pulse-pink hover:bg-pulse-pink hover:text-white transition-all shadow-pink-glow"
           >
             <DollarSign className="w-3.5 h-3.5" />

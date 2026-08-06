@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Zap, Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
+import { X, Zap, Mail, Lock, User, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const AuthModal = ({ isOpen, onClose }) => {
@@ -9,6 +9,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
@@ -34,12 +35,12 @@ export const AuthModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fadeIn">
       <div className="w-full max-w-md glass-panel rounded-3xl p-6 border border-pulse-pink/40 shadow-2xl relative">
         
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-pulse-purple/20 text-pulse-muted"
+          className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-pulse-purple/20 text-pulse-muted transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
@@ -53,7 +54,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
             {isLoginView ? 'Welcome Back to Pulse' : 'Join the Real-Time Feed'}
           </h2>
           <p className="text-xs text-pulse-muted">
-            {isLoginView ? 'Enter your credentials to access your social timeline' : 'Create an account to start posting and connecting'}
+            {isLoginView ? 'Sign in to post, like, comment, and connect' : 'Create an account to join the conversation'}
           </p>
         </div>
 
@@ -118,18 +119,27 @@ export const AuthModal = ({ isOpen, onClose }) => {
             </div>
           </div>
 
+          {/* Password Input with Show/Hide Eye Option */}
           <div>
             <label className="text-xs font-bold text-pulse-muted mb-1 block">Password</label>
             <div className="relative">
               <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-pulse-muted" />
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl glass-input text-sm focus:outline-none focus:ring-1 focus:ring-pulse-pink"
+                className="w-full pl-10 pr-10 py-2.5 rounded-xl glass-input text-sm focus:outline-none focus:ring-1 focus:ring-pulse-pink"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-pulse-muted hover:text-pulse-pink transition-colors p-1"
+                title={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </div>
 

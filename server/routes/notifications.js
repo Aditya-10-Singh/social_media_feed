@@ -11,13 +11,42 @@ router.get('/', authMiddleware, async (req, res) => {
   try {
     const notifications = await Notification.find({ recipient: req.user._id })
       .sort({ createdAt: -1 })
-      .limit(30)
+      .limit(40)
       .populate('sender', 'name username avatar')
-      .populate('post', 'content');
+      .populate({
+        path: 'post',
+        populate: { path: 'author', select: 'name username avatar' }
+      });
 
     res.json(notifications);
   } catch (error) {
     res.status(500).json({ message: 'Error loading notifications' });
+  }
+});
+
+// GET Unread Notification Count
+router.get('/unread-count', authMiddleware, async (req, res) => {
+  try {
+    const count = await Notification.countDocuments({
+      recipient: req.user._id,
+      read: false
+    });
+    res.json({ unreadCount: count });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching unread notification count' });
+  }
+});
+
+// MARK All Notifications as Read
+router.put('/read-all', authMiddleware, async (req, res) => {
+  try {
+    await Notification.updateMany(
+      { recipient: req.user._id, read: false },
+      { read: true }
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ message: 'Error marking all notifications read' });
   }
 });
 

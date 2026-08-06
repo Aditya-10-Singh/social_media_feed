@@ -44,10 +44,10 @@ export const RightBar = ({ onSelectHashtag, onSelectUser }) => {
   };
 
   return (
-    <aside className="w-80 hidden lg:flex flex-col gap-6 p-4 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto">
+    <aside className="w-80 hidden lg:flex flex-col gap-6 p-4 pb-20 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto scroll-smooth">
       
       {/* Live Hashtags Trending Panel */}
-      <div className="glass-panel p-4 rounded-3xl border border-pulse-border-dark">
+      <div className="glass-panel p-4 rounded-3xl border border-pulse-border-dark flex-shrink-0">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-pulse-pink animate-bounce" />
@@ -85,7 +85,7 @@ export const RightBar = ({ onSelectHashtag, onSelectUser }) => {
 
       {/* Suggested Creators Panel */}
       {user && suggested.length > 0 && (
-        <div className="glass-panel p-4 rounded-3xl border border-pulse-border-dark">
+        <div className="glass-panel p-4 rounded-3xl border border-pulse-border-dark flex-shrink-0">
           <div className="flex items-center gap-2 mb-4">
             <UserPlus className="w-5 h-5 text-pulse-cyan" />
             <h3 className="font-extrabold text-base tracking-tight">Who to Follow</h3>
@@ -138,7 +138,7 @@ export const RightBar = ({ onSelectHashtag, onSelectUser }) => {
       )}
 
       {/* Creator Monetization Promo Box */}
-      <div className="glass-card p-4 rounded-3xl border border-pulse-pink/30 relative overflow-hidden">
+      <div className="glass-card p-4 rounded-3xl border border-pulse-pink/30 relative overflow-hidden flex-shrink-0 mb-6">
         <div className="absolute -right-6 -top-6 w-24 h-24 bg-pulse-pink/20 rounded-full blur-xl pointer-events-none" />
         <div className="flex items-center gap-2 mb-2 text-pulse-pink">
           <Sparkles className="w-5 h-5 animate-pulse" />
