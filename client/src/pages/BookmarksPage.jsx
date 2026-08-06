@@ -9,7 +9,7 @@ export const BookmarksPage = () => {
 
   const fetchBookmarks = () => {
     const token = localStorage.getItem('pulse_token');
-    fetch('/api/posts/bookmarks', {
+    fetch(`${API_URL}/api/posts/bookmarks`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
