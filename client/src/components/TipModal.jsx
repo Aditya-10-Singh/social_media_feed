@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, DollarSign, Heart, Loader2 } from 'lucide-react';
+import { API_URL } from '../config';
 
 export const TipModal = ({ isOpen, onClose, creator, onTipped }) => {
   const [amount, setAmount] = useState(5);
@@ -15,7 +16,7 @@ export const TipModal = ({ isOpen, onClose, creator, onTipped }) => {
 
     try {
       const token = localStorage.getItem('pulse_token');
-      const res = await fetch('/api/stripe/tip', {
+      const res = await fetch(`${API_URL}/api/stripe/tip`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

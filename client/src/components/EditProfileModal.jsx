@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Camera, Save, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../config';
 
 export const EditProfileModal = ({ isOpen, onClose }) => {
   const { user, updateUser } = useAuth();
@@ -34,7 +35,7 @@ export const EditProfileModal = ({ isOpen, onClose }) => {
       if (avatarFile) {
         const formData = new FormData();
         formData.append('image', avatarFile);
-        const uploadRes = await fetch('/api/upload/image', {
+        const uploadRes = await fetch(`${API_URL}/api/upload/image`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: formData
@@ -43,7 +44,7 @@ export const EditProfileModal = ({ isOpen, onClose }) => {
         if (uploadRes.ok) finalAvatar = uploadData.url;
       }
 
-      const res = await fetch('/api/users/profile', {
+      const res = await fetch(`${API_URL}/api/users/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

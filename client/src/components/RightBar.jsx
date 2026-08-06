@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { TrendingUp, UserPlus, Sparkles, DollarSign, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../config';
 
 export const RightBar = ({ onSelectHashtag, onSelectUser }) => {
   const { user } = useAuth();
@@ -10,14 +11,14 @@ export const RightBar = ({ onSelectHashtag, onSelectUser }) => {
 
   useEffect(() => {
     // Fetch Trending Hashtags
-    fetch('/api/trending/hashtags')
+    fetch(`${API_URL}/api/trending/hashtags`)
       .then(res => res.json())
       .then(data => setTrending(data))
       .catch(err => console.error(err));
 
     // Fetch Suggested Creators
     if (user) {
-      fetch('/api/users/meta/suggested', {
+      fetch(`${API_URL}/api/users/meta/suggested`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('pulse_token')}` }
       })
         .then(res => res.json())

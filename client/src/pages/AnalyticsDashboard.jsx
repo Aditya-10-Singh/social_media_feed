@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BarChart3, Eye, Heart, MessageSquare, DollarSign, TrendingUp, Award, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../config';
 
 export const AnalyticsDashboard = () => {
   const { user } = useAuth();
@@ -9,7 +10,7 @@ export const AnalyticsDashboard = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('pulse_token');
-    fetch('/api/stripe/analytics', {
+    fetch(`${API_URL}/api/stripe/analytics`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())

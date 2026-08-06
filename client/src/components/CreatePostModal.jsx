@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Image as ImageIcon, ShieldAlert, Sparkles, Lock, DollarSign, Send, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../config';
 
 export const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
   const { user } = useAuth();
@@ -40,7 +41,7 @@ export const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
         const formData = new FormData();
         formData.append('image', imageFile);
 
-        const uploadRes = await fetch('/api/upload/image', {
+        const uploadRes = await fetch(`${API_URL}/api/upload/image`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: formData
@@ -52,7 +53,7 @@ export const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
       }
 
       // 2. Publish post
-      const res = await fetch('/api/posts', {
+      const res = await fetch(`${API_URL}/api/posts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

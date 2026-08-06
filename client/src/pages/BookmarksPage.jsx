@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Bookmark, Loader2 } from 'lucide-react';
 import { PostCard } from '../components/PostCard';
+import { API_URL } from '../config';
 
 export const BookmarksPage = () => {
   const [bookmarks, setBookmarks] = useState([]);

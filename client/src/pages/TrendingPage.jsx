@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Hash, TrendingUp, Search } from 'lucide-react';
 import { PostCard } from '../components/PostCard';
+import { API_URL } from '../config';
 
 export const TrendingPage = ({ initialTag, onSelectTag }) => {
   const [activeTag, setActiveTag] = useState(initialTag || '');
@@ -9,7 +10,7 @@ export const TrendingPage = ({ initialTag, onSelectTag }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetch('/api/trending/hashtags')
+    fetch(`${API_URL}/api/trending/hashtags`)
       .then(res => res.json())
       .then(data => setTrending(data))
       .catch(err => console.error(err));

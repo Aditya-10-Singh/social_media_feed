@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Bell, Heart, MessageSquare, UserPlus, DollarSign, Sparkles } from 'lucide-react';
 import { useSocket } from '../context/SocketContext';
+import { API_URL } from '../config';
 
 export const NotificationCenter = () => {
   const { setUnreadCount } = useSocket();
@@ -9,7 +10,7 @@ export const NotificationCenter = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('pulse_token');
-    fetch('/api/notifications', {
+    fetch(`${API_URL}/api/notifications`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())

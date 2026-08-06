@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Sparkles, Users, Loader2 } from 'lucide-react';
 import { PostCard } from '../components/PostCard';
 import { useSocket } from '../context/SocketContext';
+import { API_URL } from '../config';
 
 export const FeedPage = ({ onHashtagClick }) => {
   const { socket } = useSocket();
@@ -25,7 +26,7 @@ export const FeedPage = ({ onHashtagClick }) => {
       const token = localStorage.getItem('pulse_token');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
-      const res = await fetch(`/api/posts?feedType=${feedType}&limit=10${cursorParam}`, { headers });
+      const res = await fetch(`${API_URL}/api/posts?feedType=${feedType}&limit=10${cursorParam}`, { headers });
       const data = await res.json();
 
       if (res.ok) {
