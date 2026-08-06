@@ -34,12 +34,15 @@ app.use(cors());
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 
-app.get('/', (req, res) => {
-  res.json({
-    message: 'Welcome to Pulse Social API 🚀',
-    health: '/api/health'
-  });
-});
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve static frontend in production if built
+const clientDistPath = path.join(__dirname, '../client/dist');
+app.use(express.static(clientDistPath));
 
 // API Routes
 app.use('/api/auth', authRoutes);
@@ -55,15 +58,26 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', app: 'Pulse Social API', time: new Date() });
 });
 
+// Fallback to index.html for client-side React routing in deployment
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api') || req.path.startsWith('/socket.io')) {
+    return res.status(404).json({ message: 'API route not found' });
+  }
+  const indexPath = path.join(clientDistPath, 'index.html');
+  res.sendFile(indexPath, (err) => {
+    if (err) {
+      res.json({ message: 'Pulse Social API Active. Deploy frontend or run dev server.' });
+    }
+  });
+});
+
 // Socket.io connection handling
 io.on('connection', (socket) => {
   console.log('⚡ Client connected to Socket.io:', socket.id);
 
-  // User joins their personal notification room
   socket.on('join:room', (userId) => {
     if (userId) {
       socket.join(`user:${userId}`);
-      console.log(`User ${userId} joined personal socket room`);
     }
   });
 
@@ -78,28 +92,36 @@ io.on('connection', (socket) => {
 
 // Smart Database Connection (MongoDB Atlas / Local, with Memory Server Fallback)
 const connectDB = async () => {
-  const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/pulse_db';
-  // try {
-  //   await mongoose.connect(uri, { serverSelectionTimeoutMS: 2000 });
-  //   console.log('✅ Connected to MongoDB Database');
-  // } catch (err) {
-  //   console.log('⚠️ Local MongoDB not detected. Launching in-memory MongoDB server...');
-  //   const mongoServer = await MongoMemoryServer.create();
-  //   const mongoUri = mongoServer.getUri();
-  //   await mongoose.connect(mongoUri);
-  //   console.log('✅ Connected to In-Memory MongoDB Server');
-  // }
-  await mongoose.connect(uri, { serverSelectionTimeoutMS: 2000 });
+  const uri = process.env.MONGODB_URI;
+  if (uri) {
+    try {
+      await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
+      console.log('✅ Connected to Production MongoDB Atlas Database');
+      return;
+    } catch (err) {
+      console.error('⚠️ Could not connect to provided MONGODB_URI:', err.message);
+    }
+  }
 
-  console.log("Connected to MongoDB");
-  console.log("Database:", mongoose.connection.name);
-  console.log("Host:", mongoose.connection.host);
-  console.log("Port:", mongoose.connection.port);
+  try {
+    await mongoose.connect('mongodb://127.0.0.1:27017/pulse_db', { serverSelectionTimeoutMS: 2000 });
+    console.log('✅ Connected to Local MongoDB Database');
+  } catch (err) {
+    console.log('⚠️ Local MongoDB not detected. Launching in-memory MongoDB server...');
+    try {
+      const mongoServer = await MongoMemoryServer.create();
+      const mongoUri = mongoServer.getUri();
+      await mongoose.connect(mongoUri);
+      console.log('✅ Connected to In-Memory MongoDB Server');
+    } catch (memErr) {
+      console.error('Failed to initialize in-memory database:', memErr);
+    }
+  }
 };
 
 const startServer = (port) => {
   server.listen(port, () => {
-    console.log(`Pulse Social Server running on http://localhost:${port}`);
+    console.log(`🚀 Pulse Social Server running on http://localhost:${port}`);
   }).on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
       console.log(`⚠️ Port ${port} is currently in use. Retrying on port ${port + 1}...`);
@@ -115,4 +137,5 @@ const INITIAL_PORT = parseInt(process.env.PORT || '5000', 10);
 connectDB().then(() => {
   startServer(INITIAL_PORT);
 });
+
 
