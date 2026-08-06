@@ -120,8 +120,8 @@ const connectDB = async () => {
 };
 
 const startServer = (port) => {
-  server.listen(port, () => {
-    console.log(`🚀 Pulse Social Server running on http://localhost:${port}`);
+  server.listen(port, '0.0.0.0', () => {
+    console.log(`🚀 Pulse Social Server running on http://127.0.0.1:${port}`);
   }).on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
       console.log(`⚠️ Port ${port} is currently in use. Retrying on port ${port + 1}...`);

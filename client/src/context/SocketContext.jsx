@@ -12,7 +12,7 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     const newSocket = io('/', {
-      transports: ['websocket', 'polling']
+      transports: ['polling', 'websocket']
     });
 
     setSocket(newSocket);

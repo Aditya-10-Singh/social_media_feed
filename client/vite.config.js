@@ -7,13 +7,33 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true
+        target: 'http://127.0.0.1:5000',
+        changeOrigin: true,
+        secure: false,
+        configure: (proxy) => {
+          proxy.on('error', (err) => {
+            if (['ECONNRESET', 'ECONNABORTED', 'ECONNREFUSED', 'EPIPE'].includes(err?.code)) {
+              return;
+            }
+            console.error('API proxy error:', err);
+          });
+        }
       },
       '/socket.io': {
-        target: 'http://localhost:5000',
-        ws: true
+        target: 'http://127.0.0.1:5000',
+        ws: true,
+        changeOrigin: true,
+        secure: false,
+        configure: (proxy) => {
+          proxy.on('error', (err) => {
+            if (['ECONNRESET', 'ECONNABORTED', 'ECONNREFUSED', 'EPIPE'].includes(err?.code)) {
+              return;
+            }
+            console.error('WS proxy error:', err);
+          });
+        }
       }
     }
   }
 });
+
