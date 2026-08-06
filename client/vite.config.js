@@ -11,11 +11,13 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         configure: (proxy) => {
-          proxy.on('error', (err) => {
-            if (['ECONNRESET', 'ECONNABORTED', 'ECONNREFUSED', 'EPIPE'].includes(err?.code)) {
-              return;
+          proxy.on('error', (err, _req, res) => {
+            if (res && !res.headersSent && typeof res.writeHead === 'function') {
+              res.writeHead(502, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ error: 'Backend proxy connection failed' }));
+            } else if (res && typeof res.destroy === 'function') {
+              res.destroy();
             }
-            console.error('API proxy error:', err);
           });
         }
       },
@@ -25,11 +27,13 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         configure: (proxy) => {
-          proxy.on('error', (err) => {
-            if (['ECONNRESET', 'ECONNABORTED', 'ECONNREFUSED', 'EPIPE'].includes(err?.code)) {
-              return;
+          proxy.on('error', (err, _req, res) => {
+            if (res && !res.headersSent && typeof res.writeHead === 'function') {
+              res.writeHead(502, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ error: 'Socket proxy connection failed' }));
+            } else if (res && typeof res.destroy === 'function') {
+              res.destroy();
             }
-            console.error('WS proxy error:', err);
           });
         }
       }

@@ -134,8 +134,7 @@ const startServer = (port) => {
 
 const INITIAL_PORT = parseInt(process.env.PORT || '5000', 10);
 
-connectDB().then(() => {
-  startServer(INITIAL_PORT);
-});
+startServer(INITIAL_PORT);
+connectDB();
 
 
