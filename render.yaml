@@ -12,5 +12,5 @@ services:
         value: 10000
       - key: JWT_SECRET
         generateValue: true
-      - key: MONGODB_URI
-        sync: false
+      - key: CLIENT_URL
+        value: https://social-media-feed-flame.vercel.app

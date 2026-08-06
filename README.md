@@ -1,5 +1,8 @@
 # ⚡ Pulse — Real-Time Social Media Platform
 
+- 🌐 **Live Frontend (Vercel)**: [https://social-media-feed-flame.vercel.app/](https://social-media-feed-flame.vercel.app/)
+- 🚀 **Live Backend (Render)**: [https://social-media-feed-n0nz.onrender.com/](https://social-media-feed-n0nz.onrender.com/)
+
 A full-stack Twitter/X-like microblogging platform featuring real-time feed updates, infinite scroll, AI content moderation, Cloudinary media handling, Web Push notifications, creator monetization with Stripe, and an electric purple-pink glassmorphic design theme.
 
 ---
