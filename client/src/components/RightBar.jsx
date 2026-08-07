@@ -30,7 +30,7 @@ export const RightBar = ({ onSelectHashtag, onSelectUser }) => {
   const handleFollowToggle = async (userId) => {
     try {
       const token = localStorage.getItem('pulse_token');
-      const res = await fetch(`/api/users/${userId}/follow`, {
+      const res = await fetch(`${API_URL}/api/users/${userId}/follow`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });

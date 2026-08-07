@@ -19,7 +19,7 @@ export const TrendingPage = ({ initialTag, onSelectTag }) => {
   useEffect(() => {
     if (activeTag) {
       setLoading(true);
-      fetch(`/api/posts?tag=${activeTag}`)
+      fetch(`${API_URL}/api/posts?tag=${activeTag}`)
         .then(res => res.json())
         .then(data => {
           setPosts(data.posts || []);

@@ -25,7 +25,7 @@ export const ProfilePage = ({ username: propUsername, onRequireAuth, onSelectHas
     setLoading(true);
     try {
       // 1. Fetch target user profile by username
-      const res = await fetch(`/api/users/${targetUsername}`);
+      const res = await fetch(`${API_URL}/api/users/${targetUsername}`);
       const data = await res.json();
 
       if (res.ok && data.user) {
@@ -42,7 +42,7 @@ export const ProfilePage = ({ username: propUsername, onRequireAuth, onSelectHas
         }
 
         // 2. Fetch posts by target user ID
-        const postsRes = await fetch(`/api/posts?userId=${data.user._id}`);
+        const postsRes = await fetch(`${API_URL}/api/posts?userId=${data.user._id}`);
         const postsData = await postsRes.json();
         if (postsRes.ok) {
           setUserPosts(postsData.posts || []);
@@ -67,7 +67,7 @@ export const ProfilePage = ({ username: propUsername, onRequireAuth, onSelectHas
 
     try {
       const token = localStorage.getItem('pulse_token');
-      const res = await fetch(`/api/users/${profileUser._id}/follow`, {
+      const res = await fetch(`${API_URL}/api/users/${profileUser._id}/follow`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });

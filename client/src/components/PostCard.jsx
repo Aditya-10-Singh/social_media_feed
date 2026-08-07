@@ -30,7 +30,7 @@ export const PostCard = ({ post, onPostUpdated, onHashtagClick, onRequireAuth })
     checkAuthOrExecute(async () => {
       try {
         const token = localStorage.getItem('pulse_token');
-        const res = await fetch(`/api/posts/${post._id}/like`, {
+        const res = await fetch(`${API_URL}/api/posts/${post._id}/like`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -49,7 +49,7 @@ export const PostCard = ({ post, onPostUpdated, onHashtagClick, onRequireAuth })
     checkAuthOrExecute(async () => {
       try {
         const token = localStorage.getItem('pulse_token');
-        const res = await fetch(`/api/posts/${post._id}/bookmark`, {
+        const res = await fetch(`${API_URL}/api/posts/${post._id}/bookmark`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -67,7 +67,7 @@ export const PostCard = ({ post, onPostUpdated, onHashtagClick, onRequireAuth })
     checkAuthOrExecute(async () => {
       try {
         const token = localStorage.getItem('pulse_token');
-        const res = await fetch(`/api/posts/${post._id}/repost`, {
+        const res = await fetch(`${API_URL}/api/posts/${post._id}/repost`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
