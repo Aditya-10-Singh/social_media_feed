@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Send, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../config';
 
 export const CommentSection = ({ post, onCommentAdded }) => {
   const { user } = useAuth();
@@ -14,7 +15,7 @@ export const CommentSection = ({ post, onCommentAdded }) => {
     setSubmitting(true);
     try {
       const token = localStorage.getItem('pulse_token');
-      const res = await fetch(`/api/posts/${post._id}/comment`, {
+      const res = await fetch(`${API_URL}/api/posts/${post._id}/comment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

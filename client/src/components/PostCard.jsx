@@ -3,6 +3,7 @@ import { Heart, MessageSquare, Repeat, Bookmark, DollarSign, ShieldAlert, Sparkl
 import { useAuth } from '../context/AuthContext';
 import { CommentSection } from './CommentSection';
 import { TipModal } from './TipModal';
+import { API_URL } from '../config';
 
 export const PostCard = ({ post, onPostUpdated, onHashtagClick, onRequireAuth }) => {
   const { user } = useAuth();

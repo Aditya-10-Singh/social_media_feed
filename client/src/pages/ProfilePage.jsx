@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { PostCard } from '../components/PostCard';
 import { EditProfileModal } from '../components/EditProfileModal';
 import { TipModal } from '../components/TipModal';
+import { API_URL } from '../config';
 
 export const ProfilePage = ({ username: propUsername, onRequireAuth, onSelectHashtag, onSelectUser }) => {
   const { user: currentUser } = useAuth();
